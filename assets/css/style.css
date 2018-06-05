@@ -1,0 +1,36 @@
+#playerRow
+{
+    height: 200px;
+}
+
+#Chewie
+{
+    width: 100%;
+    height: 100%;
+}
+
+#BB8
+{
+    width: 100%;
+    height: 100%;
+}
+
+#Ewok
+{
+    width: 100%;
+    height: 100%;
+}
+
+#Porg
+{
+    width: 50%;
+    height: 50%;
+}
+
+.playerChar
+{
+    display: block;
+    margin-right: auto;
+    margin-left: auto;
+    width: 100%;
+}

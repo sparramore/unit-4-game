@@ -59,7 +59,7 @@ function initGame()
     heroesList = [];
     heroesList.push(new character(Rando(85,115),Rando(5,20),Rando(5,10),0,"Chewie","assets/images/baby-chewie.jpg")); //Chewie
     heroesList.push(new character(Rando(95,130),Rando(2,10),Rando(15,20),1,"BB8","assets/images/BB8.jpeg")); //BB8
-    heroesList.push(new character(Rando(65,130),Rando(10,20),Rando(2,10),2,"Ewok","assets/images/ewok.jpg")); //Ewok
+    heroesList.push(new character(/*Rando(65,130)*/10,Rando(10,20),Rando(2,10),2,"Ewok","assets/images/ewok.jpg")); //Ewok
     heroesList.push(new character(Rando(100,120),Rando(5,15),Rando(5,15),3,"Porg","assets/images/star-wars-porg.jpg")); //Porg
 
     selectedHero = -1;
@@ -81,8 +81,9 @@ function initGame()
 
 function resolveCombat()
 {
-    if(currentEnemy == -1)
+    if(currentEnemy == -1 || selectedHero.charCurHealth <= 0)
     {
+        console.log("return");
         return;
     }
     console.log("Combat things happening!");
@@ -204,7 +205,7 @@ function HandlePlayerClick(index)
     }
 
     //we've already selected the hero.
-    if(currentEnemy === -1 && index !== selectedHero.charIndex)
+    if(currentEnemy === -1 && index !== selectedHero.charIndex && selectedHero.charCurHealth >= 0)
     {
         //we need to select the current enemy.
         selectEnemy(index);

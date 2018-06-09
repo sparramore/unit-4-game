@@ -2,7 +2,7 @@
 
 class character
 {
-    constructor(inStartingHealth,inAttack,inDef,inID,inName)
+    constructor(inStartingHealth,inAttack,inDef,inID,inName,inPath)
     {
         this.charCurHealth = inStartingHealth;
         this.charBaseAtk = inAttack;
@@ -11,15 +11,26 @@ class character
         this.charIndex = inID;
         this.charName = inName;
         this.charLiving = true;
+        this.charPath = inPath;
+        console.log(this);
     }
 
-    Combat(Defender)
+    Combat()
     {
+        console.log("------------------------");
+        console.log(this);
+        console.log("------------------------");
+        console.log(currentEnemy);
         //have the defender attacked by the character
-        Defender.charCurHealth -= this.charAtk;
+        currentEnemy.charCurHealth -= this.charAtk;
         //have the attackers attack double.
         this.charAtk += this.charBaseAtk;
-        this.charCurHealth -= Defender.charDef;
+        this.charCurHealth -= currentEnemy.charDef;
+        console.log("------------------------");
+        console.log(this);
+        console.log("------------------------");
+        console.log(currentEnemy);
+
     }
 }
 
@@ -27,22 +38,86 @@ var selectedHero;
 var currentEnemy;
 var heroesList = [];
 
+
+
 function initGame()
 {
-    heroesList.push(new character(1,2,3,0)); //Chewie
-    heroesList.push(new character(1,2,3,1)); //BB8
-    heroesList.push(new character(1,2,3,2)); //Ewok
-    heroesList.push(new character(1,2,3,3)); //Porg
+    heroesList = [];
+    heroesList.push(new character(100,25,50,0,"Chewie","assets/images/baby-chewie.jpg")); //Chewie
+    heroesList.push(new character(75,30,25,1,"BB8","assets/images/BB8.jpeg")); //BB8
+    heroesList.push(new character(125,40,3,2,"Ewok","assets/images/ewok.jpg")); //Ewok
+    heroesList.push(new character(80,30,3,3,"Porg","assets/images/star-wars-porg.jpg")); //Porg
 
     selectedHero = -1;
     currentEnemy = -1;
+    for(var i = 0; i < heroesList.length;i++)
+    {
+        console.log("initing char " + i + " " + heroesList[i].charName + "-col")
+        $("#" + heroesList[i].charName + "-col").append($("#" + heroesList[i].charName));
+        $("#" + heroesList[i].charName + "-col").append($("#" + heroesList[i].charName + "-text"));
+        $("#" + heroesList[i].charName).show();
+        $("#" + heroesList[i].charName + "-text").show();
+        $("#" + heroesList[i].charName).css("background-color","white");
+        $("#" + heroesList[i].charName + "-text").text(heroesList[i].charName +": " + heroesList[i].charCurHealth);
+    }
+    $("#reset").hide();
+    
+    $("#instructions").text("Please Select Your Hero.");
+}
+
+function resolveCombat()
+{
+    if(currentEnemy == -1)
+    {
+        return;
+    }
+    console.log("Combat things happening!");
+        //we are attacking the enemy.
+    selectedHero.Combat();
+    $("#" + selectedHero.charName + "-text").text(selectedHero.charName +": " + selectedHero.charCurHealth);
+    $("#" + currentEnemy.charName + "-text").text(currentEnemy.charName +": " + currentEnemy.charCurHealth);
+    if(selectedHero.charCurHealth <= 0)
+    {
+        //we have lost.
+        console.log(selectedHero);
+        console.log("we lost");
+        //we need to put up a reset button.
+        $("#reset").show();
+    }
+    if(currentEnemy.charCurHealth <= 0)
+    {
+        //we have killed the enemy.
+        $("#" + currentEnemy.charName).hide();
+        $("#" + currentEnemy.charName + "-text").hide();
+        heroesList[currentEnemy.charIndex].charLiving = false;
+        currentEnemy = -1;
+        $("#instructions").text("Please Select Another Opponent.");
+    }
+    var win = true;
+    //check to see if all the enemies are dead.
+    for(var i =0;i < heroesList.length;i++)
+    {
+        if(i !== selectedHero.charIndex)
+        {
+            if(heroesList[i].charLiving === true)
+            {
+                win = false;
+            }
+        }
+    }
+
+    if(win === true)
+    {
+        $("#instructions").text("Press Reset To Fight Again.");
+        $("#reset").show();
+    }
 }
 
 //we want to move an enemy down in order to be able to fight it.
 function selectEnemy(enemy)
 {
-    //set the enemy id to the identifier of the new enemy
-    currentEnemy = enemy;
+    //set the new enemy
+    currentEnemy = heroesList[enemy];
 }
 
 $(document).ready(function() {
@@ -63,44 +138,66 @@ $(document).ready(function() {
         HandlePlayerClick(3);
     });
 
+    $("#attack").on("click",function(){
+        resolveCombat();
+    });
+
+    $("#reset").on("click",function(){
+        initGame();
+    });
+
+    $("#reset").hide();
+
+    $("#instructions").text("Please Select Your Hero.");
+
+    initGame();
 });
-
-
 
 
 function HandlePlayerClick(index)
 {
     //if we've selected both our hero and our enemy, then we should only be clicking on the current enemy
-    if(selectedHero >= 0 && currentEnemy >= 0)
+    if(selectedHero !== -1 && currentEnemy !== -1)
     {
         //if we are not selecting the current enemy then we should do anything about the click
-        if(index !== currentEnemy)
+        if(index !== currentEnemy.charIndex)
         {
+            console.log("clicked on something that was not the enemy.");
             return;
         }
     }
 
     if(selectedHero === -1)
     {
+        console.log("selectedHero")
         //we have not selected a hero. the person we've selected is our hero.
-        selectedHero = index;
+        selectedHero = heroesList[index];
+        //do something here to highlight that you are the hero.
+        $("#" + selectedHero.charName).css("background-color","green");
+        $("#instructions").text("Please Select Your Opponent.");
         //any functionality that we need to change for when a hero is selected.
         return;
     }
 
     //we've already selected the hero.
-    if(currentEnemy === -1)
+    if(currentEnemy === -1 && index !== selectedHero.charIndex)
     {
         //we need to select the current enemy.
         selectEnemy(index);
+        //we are going to remove the enemy from the list of playable characters and put them in the arena
+        $("#arena").append($("#" + currentEnemy.charName));
+        $("#arena").append($("#" + currentEnemy.charName + "-text"));
+        $("#" + currentEnemy.charName).css("background-color","red");
+        $("#instructions").text("FIGHT!");
+        return;
     }
 
-
-
+    resolveCombat();
 }
 
 window.onload
 {
+    console.log("onLoad");
     initGame();
 }
 //we need a function to change the state of a character to be dead.

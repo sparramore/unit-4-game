@@ -30,9 +30,22 @@ class character
     }
 }
 
+
 var selectedHero;
 var currentEnemy;
 var heroesList = [];
+var song;
+
+
+
+function playAudio() { 
+    song.play(); 
+ } 
+
+function stopAudio() { 
+    song.pause();
+    song.currentTime = 0
+}
 
 function Rando(low,high)
 {
@@ -92,6 +105,7 @@ function resolveCombat()
         heroesList[currentEnemy.charIndex].charLiving = false;
         currentEnemy = -1;
         $("#instructions").text("Please Select Another Opponent.");
+        stopAudio();
     }
     var win = true;
     //check to see if all the enemies are dead.
@@ -151,6 +165,8 @@ $(document).ready(function() {
     $("#instructions").text("Please Select Your Hero.");
 
     initGame();
+    
+    song = new Audio('assets/audio/porg-wars.mp3');
 });
 
 
@@ -175,7 +191,7 @@ function HandlePlayerClick(index)
         //do something here to highlight that you are the hero.
         $("#" + selectedHero.charName).css("background-color","green");
         //turning our enemies red.
-        for(var i = 0;heroesList.length;i++)
+        for(var i = 0;i < heroesList.length;i++)
         {
             if(heroesList[i].charIndex != index)
             {
@@ -197,6 +213,7 @@ function HandlePlayerClick(index)
         $("#arena").append($("#" + currentEnemy.charName + "-text"));
         $("#" + currentEnemy.charName).css("background-color","black");
         $("#instructions").text("FIGHT!");
+        playAudio();
         return;
     }
 

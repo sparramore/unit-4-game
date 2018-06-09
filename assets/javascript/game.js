@@ -17,19 +17,15 @@ class character
 
     Combat()
     {
-        console.log("------------------------");
-        console.log(this);
-        console.log("------------------------");
-        console.log(currentEnemy);
+        var attackDam = this.charAtk;
         //have the defender attacked by the character
         currentEnemy.charCurHealth -= this.charAtk;
         //have the attackers attack double.
         this.charAtk += this.charBaseAtk;
         this.charCurHealth -= currentEnemy.charDef;
-        console.log("------------------------");
-        console.log(this);
-        console.log("------------------------");
-        console.log(currentEnemy);
+        var defenseDam = currentEnemy.charDef;
+        console.log("combat!")
+        $("#instructions").text("You did: " + attackDam + "dam " + currentEnemy.charName + " did: " + currentEnemy.charDef + "dam");
 
     }
 }
@@ -38,15 +34,20 @@ var selectedHero;
 var currentEnemy;
 var heroesList = [];
 
-
+function Rando(low,high)
+{
+   var difference = high - low;
+   difference += 1;
+   return Math.floor((Math.random() * difference) + low);
+}
 
 function initGame()
 {
     heroesList = [];
-    heroesList.push(new character(100,25,50,0,"Chewie","assets/images/baby-chewie.jpg")); //Chewie
-    heroesList.push(new character(75,30,25,1,"BB8","assets/images/BB8.jpeg")); //BB8
-    heroesList.push(new character(125,40,3,2,"Ewok","assets/images/ewok.jpg")); //Ewok
-    heroesList.push(new character(80,30,3,3,"Porg","assets/images/star-wars-porg.jpg")); //Porg
+    heroesList.push(new character(Rando(85,115),Rando(5,20),Rando(5,10),0,"Chewie","assets/images/baby-chewie.jpg")); //Chewie
+    heroesList.push(new character(Rando(95,130),Rando(2,10),Rando(15,20),1,"BB8","assets/images/BB8.jpeg")); //BB8
+    heroesList.push(new character(Rando(65,130),Rando(10,20),Rando(2,10),2,"Ewok","assets/images/ewok.jpg")); //Ewok
+    heroesList.push(new character(Rando(100,120),Rando(5,15),Rando(5,15),3,"Porg","assets/images/star-wars-porg.jpg")); //Porg
 
     selectedHero = -1;
     currentEnemy = -1;
@@ -79,8 +80,7 @@ function resolveCombat()
     if(selectedHero.charCurHealth <= 0)
     {
         //we have lost.
-        console.log(selectedHero);
-        console.log("we lost");
+        $("#instructions").text("Game Over!");
         //we need to put up a reset button.
         $("#reset").show();
     }
@@ -174,6 +174,14 @@ function HandlePlayerClick(index)
         selectedHero = heroesList[index];
         //do something here to highlight that you are the hero.
         $("#" + selectedHero.charName).css("background-color","green");
+        //turning our enemies red.
+        for(var i = 0;heroesList.length;i++)
+        {
+            if(heroesList[i].charIndex != index)
+            {
+                $("#" + heroesList[i].charName).css("background-color","red");
+            }
+        }
         $("#instructions").text("Please Select Your Opponent.");
         //any functionality that we need to change for when a hero is selected.
         return;
@@ -187,7 +195,7 @@ function HandlePlayerClick(index)
         //we are going to remove the enemy from the list of playable characters and put them in the arena
         $("#arena").append($("#" + currentEnemy.charName));
         $("#arena").append($("#" + currentEnemy.charName + "-text"));
-        $("#" + currentEnemy.charName).css("background-color","red");
+        $("#" + currentEnemy.charName).css("background-color","black");
         $("#instructions").text("FIGHT!");
         return;
     }
